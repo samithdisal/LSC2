@@ -45,7 +45,7 @@ func main() {
 
 //endregion
 
-var pauseDuration time.Duration = 12 * time.Second
+//var pauseDuration time.Duration = 12 * time.Second
 
 func getContent(url string) string {
 	log.Println("Fetcing ", url)
@@ -55,11 +55,12 @@ func getContent(url string) string {
 		return ""
 	}
 
-	content := doc.Find("div.b-story-body-x.x-r15").First()
+	content := doc.Find("div.b-story-body-x").First()
 	title := doc.Find("div.b-story-header h1").First().Text()
 	author := doc.Find("span.b-story-user-y.x-r22 a").First().Text()
 	fileName := fmt.Sprintf("%s_%s.txt", Marshal(author, true), Marshal(title, true))
-	out, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND, 0777)
+	out, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+	defer out.Close()
 	if err != nil {
 		log.Print("Failed to create/open file ", fileName, err)
 		return ""
@@ -75,7 +76,7 @@ func getContent(url string) string {
 	}
 	out.WriteString(content.Text())
 	out.WriteString("\n\n---------------------------------\n\n")
-	out.Close()
+	out.Sync()
 	log.Println("Done ", url)
 
 	next := doc.Find("a.b-pager-next")
@@ -90,11 +91,12 @@ func getContent(url string) string {
 }
 
 func writeEnd(fileName string) {
-	out, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND, 0777)
+	out, err := os.OpenFile(fileName, os.O_WRONLY|os.O_APPEND, 0777)
 	if err != nil {
 		log.Print("Failed to create/open file ", fileName, err)
 	}
 	out.WriteString("\n\n------------- THE END --------------------\n\n")
+	out.Sync()
 	out.Close()
 }
 
@@ -102,7 +104,8 @@ func getPub(url string) {
 	next := url
 	for next != "" {
 		next = getContent(next)
-		time.Sleep(pauseDuration)
+		//next = ""
+		//time.Sleep(pauseDuration)
 	}
 }
 
