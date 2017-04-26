@@ -45,6 +45,8 @@ func main() {
 
 //endregion
 
+var pauseDuration time.Duration = 12 * time.Second
+
 func getContent(url string) string {
 	log.Println("Fetcing ", url)
 	doc, err := goquery.NewDocument(url)
@@ -100,6 +102,7 @@ func getPub(url string) {
 	next := url
 	for next != "" {
 		next = getContent(next)
+		time.Sleep(pauseDuration)
 	}
 }
 
