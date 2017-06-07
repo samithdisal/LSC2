@@ -6,3 +6,6 @@ clean:
 
 dep: all
 	scp lew l1r:/home/rout/st
+
+test: all
+	./lew -s
