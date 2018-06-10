@@ -11,10 +11,10 @@ import (
 	"malhora.info/lew/crw"
 )
 
-func serv(host string) {
+func serv(host string) error {
 	log.Printf("Listening on %s", host)
 	http.HandleFunc("/job/submit", jobSubmit)
-	http.ListenAndServe(host, nil)
+	return http.ListenAndServe(host, nil)
 }
 
 func jobSubmit(w http.ResponseWriter, r *http.Request) {
@@ -29,11 +29,11 @@ func jobSubmit(w http.ResponseWriter, r *http.Request) {
 
 func scheduleJob(url string, typ string) string {
 	id := xid.New().String()
-	go _jobExec(url, typ, id)
+	go jobExec(url, typ, id)
 	return id
 }
 
-func _jobExec(url string, typ string, id string) {
+func jobExec(url string, typ string, id string) {
 
 	os.MkdirAll("."+string(filepath.Separator)+id, 0777)
 
